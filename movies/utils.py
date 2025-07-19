@@ -1,6 +1,7 @@
 import pandas as pd, requests, os, google.generativeai as genai
 from django.conf import settings
 from dotenv import dotenv_values
+import os
 
 ENV = dotenv_values()
 CSV_PATH = settings.BASE_DIR / "movies.csv"
@@ -31,12 +32,13 @@ def unique_genres(df: pd.DataFrame):
 
 
 # ------------------------- Gemini ------------------------------
-GEMINI_KEY = ENV["GEMINI_API_KEY"]
+GEMINI_KEY = os.getenv("GEMINI_API_KEY")
+
 genai.configure(api_key=GEMINI_KEY)
 model = genai.GenerativeModel("models/gemini-1.5-flash-latest")  # cheaper + fast
 
 # ------------------------- Backup API keys ---------------------
-OMDB_KEY = ENV.get("OMDB_API_KEY")
+OMDB_KEY = os.getenv("OMDB_API_KEY")
 
 
 # ------------------------- SEARCH ------------------------------
