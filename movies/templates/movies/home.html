@@ -63,22 +63,34 @@
 <!-- Movie Cards -->
 <div class="row">
   {% for m in movies %}
-  <div class="col-md-3 mb-4">
-    <div class="card bg-secondary text-light hover-scale h-100">
-      <img src="/media/{{ m.poster }}" class="card-img-top" alt="{{ m.title }}">
-      <div class="card-body">
-        <h5 class="card-title info">{{ m.title }}</h5>
-        <p class="card-text">
-          Year: {{ m.year }}<br>
-          Genre: {{ m.genre }}<br>
-          Lang: {{ m.language }}<br>
-          Cast: {{ m.cast }}<br>
-          IMDb: {{ m.imdb }}, RT: {{ m.rt }}, Google: {{ m.google }}<br>
-          <small class="text-warning">Added by: {{ m.added_by }}</small>
-        </p>
+    <div class="col-md-3 mb-4 d-flex">
+      <div class="card bg-secondary text-light hover-scale h-100 d-flex flex-column w-100">
+        <img src="/media/{{ m.poster }}" class="card-img-top" alt="{{ m.title }}">
+        <div class="card-body flex-grow-1 d-flex flex-column">
+          <h5 class="card-title info">{{ m.title }}</h5>
+          <p class="card-text mb-2">
+            Year: {{ m.year }}<br>
+            Genre: {{ m.genre }}<br>
+            Lang: {{ m.language }}<br>
+            Cast: {{ m.cast }}<br>
+            IMDb: {{ m.imdb }}, RT: {{ m.rt }}, Google: {{ m.google }}<br>
+            <small class="text-warning">Added by: {{ m.added_by }}</small>
+          </p>
+        </div>
+        <div class="card-footer bg-transparent border-0 mt-auto">
+          <form method="post" action="{% url 'toggle_watch' %}">
+            {% csrf_token %}
+            <input type="hidden" name="title" value="{{ m.title }}">
+            <button type="submit" class="btn w-100 btn-sm {% if m.watched %}btn-neon{% else %}btn-danger{% endif %}">
+              {% if m.watched %}Watched{% else %}Unwatched{% endif %}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
   {% endfor %}
 </div>
+
 {% endblock %}
+
+

@@ -31,6 +31,7 @@ urlpatterns = [
     path('', mv.home, name='home'),
     path('search/', mv.search, name='search'),
     path('add/', mv.add_movie, name='add_movie'),
+    path("toggle/", mv.toggle_watch, name="toggle_watch"),   # ← NEW
 ]
 
 if settings.DEBUG:

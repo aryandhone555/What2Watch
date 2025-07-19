@@ -43,3 +43,16 @@ body {
   box-shadow: 0 0 12px rgba(255, 0, 0, 0.7);
   transform: scale(1.07);
 }
+
+/* neon‑green button */
+.btn-neon{
+  background:#39ff14!important;
+  color:#000!important;
+  font-weight:bold;
+  border:none;
+  transition:transform .1s, box-shadow .1s;
+}
+.btn-neon:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 8px #39ff14;
+}

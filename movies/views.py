@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.views.decorators.http import require_POST
+from .utils_watch import read_status, toggle_status 
 
 # Create your views here.
 from django.shortcuts import render, redirect
@@ -65,19 +67,41 @@ def home(request):
             pass
     if my_movies:
         df = df[df["added_by"] == request.user.username]
+    
+    # add watched flag ------------------------------------------------
+    user_status = read_status(request.user.username)
+    records = []
+    for _, row in df.iterrows():
+        rec = row.to_dict()
+        rec["watched"] = user_status.get(row["title"], False)
+        records.append(rec)
+
+    # context = {
+    #     "movies": df.to_dict("records"),
+    #     "lang_choices": lang_choices,
+    #     "genre_choices": genre_choices,
+    #     "year_choices": year_choices,
+    #     "sel_lang": sel_lang,
+    #     "sel_genre": sel_genre,
+    #     "sel_start_year": y1,
+    #     "sel_end_year": y2,
+    #     "my_movies_checked": my_movies,
+    # }
 
     context = {
-        "movies": df.to_dict("records"),
-        "lang_choices": lang_choices,
-        "genre_choices": genre_choices,
-        "year_choices": year_choices,
-        "sel_lang": sel_lang,
-        "sel_genre": sel_genre,
-        "sel_start_year": y1,
-        "sel_end_year": y2,
-        "my_movies_checked": my_movies,
-    }
+    "movies": records,     # pass the updated list with watched info!
+    "lang_choices": lang_choices,
+    "genre_choices": genre_choices,
+    "year_choices": year_choices,
+    "sel_lang": sel_lang,
+    "sel_genre": sel_genre,
+    "sel_start_year": y1,
+    "sel_end_year": y2,
+    "my_movies_checked": my_movies,}
+
+
     return render(request, "movies/home.html", context)
+
 # def home(request):
 #     df = read_catalog()
 
@@ -154,3 +178,12 @@ def add_movie(request):
     row = {**data, "poster": f"posters/{fname}", "added_by": request.user.username}
     write_row(row)
     return redirect("home")
+
+# Toggle view
+@login_required
+@require_POST
+def toggle_watch(request):
+    title = request.POST["title"]
+    toggle_status(request.user.username, title)
+    # return to the same page
+    return redirect(request.META.get("HTTP_REFERER", "home"))
