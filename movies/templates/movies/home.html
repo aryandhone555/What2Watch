@@ -1,0 +1,70 @@
+{% extends 'movies/base.html' %}
+{% load static %}
+{% block content %}
+<h2 class="mb-4">🎞️ Explore Movies</h2>
+
+<!-- Filters -->
+<form class="row g-2 mb-4" method="get">
+  <div class="col-md-3">
+    <select name="lang" class="form-select">
+      <option value="">Any language</option>
+      {% for l in lang_choices %}
+        <option value="{{ l }}" {% if l == sel_lang %}selected{% endif %}>{{ l }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="genre" class="form-select">
+      <option value="">Any genre</option>
+      {% for g in genre_choices %}
+        <option value="{{ g }}" {% if g == sel_genre %}selected{% endif %}>{{ g }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="start_year" class="form-select">
+      <option value="">Start year</option>
+      {% for y in year_choices %}
+        <option value="{{ y }}" {% if y|stringformat:"s" == sel_start_year %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="end_year" class="form-select">
+      <option value="">End year</option>
+      {% for y in year_choices %}
+        <option value="{{ y }}" {% if y|stringformat:"s" == sel_end_year %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  
+  <div class="col-md-2 d-flex gap-2">
+  <button class="btn btn-danger w-100" type="submit">Apply</button>
+  <a href="{% url 'home' %}" class="btn btn-secondary w-100">Clear</a>
+</div>
+
+</form>
+
+
+<!-- Movie Cards -->
+<div class="row">
+  {% for m in movies %}
+  <div class="col-md-3 mb-4">
+    <div class="card bg-secondary text-light hover-scale h-100">
+      <img src="/media/{{ m.poster }}" class="card-img-top" alt="{{ m.title }}">
+      <div class="card-body">
+        <h5 class="card-title info">{{ m.title }}</h5>
+        <p class="card-text">
+          Year: {{ m.year }}<br>
+          Genre: {{ m.genre }}<br>
+          Lang: {{ m.language }}<br>
+          Cast: {{ m.cast }}<br>
+          IMDb: {{ m.imdb }}, RT: {{ m.rt }}, Google: {{ m.google }}<br>
+          <small class="text-warning">Added by: {{ m.added_by }}</small>
+        </p>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

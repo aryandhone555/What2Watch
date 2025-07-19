@@ -1,0 +1,12 @@
+{% extends 'movies/base.html' %}
+{% load static %}
+<!-- templates/movies/register.html -->
+{% block content %}
+<div class="col-md-4 mx-auto mt-5">
+  <h3 class="mb-4">📝 Register</h3>
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-danger w-100">Register</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% load static %}
+<!-- templates/movies/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>What2Watch</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-dark text-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-black px-4">
+    <a class="navbar-brand fw-bold" href="{% url 'home' %}">🎬 What2Watch</a>
+    <div class="collapse navbar-collapse">
+      <form class="d-flex ms-auto" method="get" action="{% url 'search' %}">
+        <input class="form-control me-2" name="q" placeholder="Search movie title...">
+        <button class="btn btn-danger">Search</button>
+      </form>
+      {% if user.is_authenticated %}
+        <span class="mx-3">Hi, {{ user.username }}</span>
+        <a href="{% url 'logout' %}" class="btn btn-outline-light">Logout</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-light ms-3">Login</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Carousel -->
+  <div class="swiper my-3 container">
+    <div class="swiper-wrapper">
+      {% for movie in movies|slice:":4" %}
+      <div class="swiper-slide">
+        <img src="/media/{{ movie.poster }}" class="img-fluid rounded" />
+      </div>
+      {% endfor %}
+    </div>
+    <div class="swiper-pagination"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container my-4">
+    {% block content %}{% endblock %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper('.swiper', {
+      loop: true,
+      pagination: { el: '.swiper-pagination' },
+      autoplay: { delay: 2500 }
+    });
+  </script>
+</body>
+</html>
