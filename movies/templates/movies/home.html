@@ -37,7 +37,20 @@
       {% endfor %}
     </select>
   </div>
-  
+
+<div class="col-md-2 d-flex align-items-center mt-2">
+  <button type="button"
+        id="myMoviesBtn"
+        class="my-movies-btn {% if my_movies_checked %}active{% endif %}">
+  My Movies
+</button>
+
+</div>
+
+<input type="hidden" name="my_movies" id="myMoviesInput" value="{% if my_movies_checked %}1{% else %}0{% endif %}">
+
+
+
   <div class="col-md-2 d-flex gap-2">
   <button class="btn btn-danger w-100" type="submit">Apply</button>
   <a href="{% url 'home' %}" class="btn btn-secondary w-100">Clear</a>

@@ -18,3 +18,28 @@ body {
   font-weight: 700;
   font-size: 1.1rem;
 }
+
+.my-movies-btn {
+  background-color: #e50914 !important;  /* Netflix red */
+  color: white !important;
+  border: none !important;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.my-movies-btn:hover {
+  background-color: #b20710 !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(229, 9, 20, 0.6);
+}
+
+.my-movies-btn.active {
+  background-color: #a1060e !important;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.7);
+  transform: scale(1.07);
+}

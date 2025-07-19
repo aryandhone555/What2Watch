@@ -45,10 +45,11 @@ def home(request):
     year_choices = list(range(min(all_years), max(all_years)+1)) if all_years else []
 
     # selected filters
-    sel_lang  = request.GET.get("lang")
-    sel_genre = request.GET.get("genre")
-    y1 = request.GET.get("start_year")
-    y2 = request.GET.get("end_year")
+    sel_lang    = request.GET.get("lang")
+    sel_genre   = request.GET.get("genre")
+    y1          = request.GET.get("start_year")
+    y2          = request.GET.get("end_year")
+    my_movies   = request.GET.get("my_movies") == "1"
 
     # filtering
     if sel_lang:
@@ -61,6 +62,8 @@ def home(request):
             df = df[df["year"].astype(str).str[:4].astype(int).between(y1, y2)]
         except ValueError:
             pass
+    if my_movies:
+        df = df[df["added_by"] == request.user.username]
 
     context = {
         "movies": df.to_dict("records"),
@@ -71,8 +74,47 @@ def home(request):
         "sel_genre": sel_genre,
         "sel_start_year": y1,
         "sel_end_year": y2,
+        "my_movies_checked": my_movies,
     }
     return render(request, "movies/home.html", context)
+# def home(request):
+#     df = read_catalog()
+
+#     # dropdown data
+#     lang_choices  = unique_languages(df)
+#     genre_choices = unique_genres(df)
+#     all_years = sorted(df["year"].dropna().astype(str).str[:4].astype(int).unique())
+#     year_choices = list(range(min(all_years), max(all_years)+1)) if all_years else []
+
+#     # selected filters
+#     sel_lang  = request.GET.get("lang")
+#     sel_genre = request.GET.get("genre")
+#     y1 = request.GET.get("start_year")
+#     y2 = request.GET.get("end_year")
+
+#     # filtering
+#     if sel_lang:
+#         df = df[df["language"].str.contains(sel_lang, case=False, na=False)]
+#     if sel_genre:
+#         df = df[df["genre"].str.contains(sel_genre, case=False, na=False)]
+#     if y1 and y2:
+#         try:
+#             y1, y2 = int(y1), int(y2)
+#             df = df[df["year"].astype(str).str[:4].astype(int).between(y1, y2)]
+#         except ValueError:
+#             pass
+
+#     context = {
+#         "movies": df.to_dict("records"),
+#         "lang_choices": lang_choices,
+#         "genre_choices": genre_choices,
+#         "year_choices": year_choices,
+#         "sel_lang": sel_lang,
+#         "sel_genre": sel_genre,
+#         "sel_start_year": y1,
+#         "sel_end_year": y2,
+#     }
+#     return render(request, "movies/home.html", context)
 
 # def home(request):
 #     df = read_catalog()
