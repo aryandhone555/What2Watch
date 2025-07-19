@@ -46,14 +46,16 @@
   <!-- Carousel -->
   <div class="swiper my-3 container">
     <div class="swiper-wrapper">
-      {% for movie in movies|slice:":4" %}
+      {% for movie in movies %}
       <div class="swiper-slide">
         <img src="/media/{{ movie.poster }}" class="img-fluid rounded" />
+        
       </div>
       {% endfor %}
     </div>
     <div class="swiper-pagination"></div>
   </div>
+  
 
   <!-- Main Content -->
   <div class="container my-4">

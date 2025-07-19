@@ -35,6 +35,7 @@ def custom_logout(request):
 #--------------------------------------------------------------------------------------------
 
 @login_required
+
 def home(request):
     df = read_catalog()
 
