@@ -62,7 +62,8 @@ def home(request):
     # Build watched status
     user_watch_status = {
         ws.title: ws.watched
-        for ws in WatchStatus.objects.filter(username=request.user.username)
+        for ws in WatchStatus.objects.filter(user=request.user)
+
     }
 
     records = []
@@ -141,7 +142,7 @@ def add_movie(request):
 def toggle_watch(request):
     title = request.POST["title"]
     user = request.user.username
-
+    
     watch, created = WatchStatus.objects.get_or_create(username=user, title=title)
     watch.watched = not watch.watched
     watch.save()
