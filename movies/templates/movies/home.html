@@ -65,7 +65,7 @@
   {% for m in movies %}
     <div class="col-md-3 mb-4 d-flex">
       <div class="card bg-secondary text-light hover-scale h-100 d-flex flex-column w-100">
-        <img src="/media/{{ m.poster }}" class="card-img-top" alt="{{ m.title }}">
+        <img src="{{ m.poster.url }}" class="card-img-top" alt="{{ m.title }}">
         <div class="card-body flex-grow-1 d-flex flex-column">
           <h5 class="card-title info">{{ m.title }}</h5>
           <p class="card-text mb-2">
