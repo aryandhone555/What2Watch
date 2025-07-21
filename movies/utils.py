@@ -3,7 +3,7 @@ import requests
 import os
 import google.generativeai as genai
 from django.contrib.auth.models import User
-from movies.models import Movie, WatchStatus
+from what2watch.models import Movie, WatchStatus
 from dotenv import dotenv_values
 
 ENV = dotenv_values()
