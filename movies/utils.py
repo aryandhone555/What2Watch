@@ -1,50 +1,51 @@
-import pandas as pd, requests, os, google.generativeai as genai
-from django.conf import settings
-from dotenv import dotenv_values
+import pandas as pd
+import requests
 import os
+import google.generativeai as genai
+from django.contrib.auth.models import User
+from your_app.models import Movie, WatchStatus
+from dotenv import dotenv_values
 
 ENV = dotenv_values()
-CSV_PATH = settings.BASE_DIR / "movies.csv"
-HEADERS = [
-    "title","year","genre","language","cast","imdb","rt","google","poster","added_by"
-]
-# ------------------------- CSV helpers -------------------------
-
-def read_catalog():
-    if not CSV_PATH.exists():
-        return pd.DataFrame(columns=HEADERS)
-    return pd.read_csv(CSV_PATH)
-
-def write_row(row_dict):
-    df = read_catalog()
-    df = pd.concat([df, pd.DataFrame([row_dict])], ignore_index=True)
-    df.to_csv(CSV_PATH, index=False)
-
-def exists(title: str) -> bool:
-    df = read_catalog()
-    return title.strip().lower() in df["title"].str.lower().tolist()
-
-def unique_languages(df: pd.DataFrame):
-    return sorted({l.strip() for lang in df["language"].dropna() for l in str(lang).split(",")})
-
-def unique_genres(df: pd.DataFrame):
-    return sorted({g.strip() for genre in df["genre"].dropna() for g in str(genre).split(",")})
-
-
-# ------------------------- Gemini ------------------------------
 GEMINI_KEY = os.getenv("GEMINI_API_KEY")
-
-genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel("models/gemini-1.5-flash-latest")  # cheaper + fast
-
-# ------------------------- Backup API keys ---------------------
 OMDB_KEY = os.getenv("OMDB_API_KEY")
 
+genai.configure(api_key=GEMINI_KEY)
+model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
 
-# ------------------------- SEARCH ------------------------------
+# ------------------- Database Helpers -------------------
+
+def movie_exists(title: str) -> bool:
+    return Movie.objects.filter(title__iexact=title.strip()).exists()
+
+def add_movie_to_db(movie_dict: dict, added_by: str = "") -> Movie:
+    movie, created = Movie.objects.get_or_create(
+        title=movie_dict["title"],
+        defaults={
+            "year": movie_dict.get("year"),
+            "genre": movie_dict.get("genre"),
+            "language": movie_dict.get("language"),
+            "cast": movie_dict.get("cast"),
+            "imdb": movie_dict.get("imdb"),
+            "rt": movie_dict.get("rt"),
+            "google": movie_dict.get("google"),
+            "poster": movie_dict.get("poster_url"),
+            "added_by": added_by,
+        }
+    )
+    return movie
+
+def get_unique_languages():
+    langs = Movie.objects.exclude(language__isnull=True).values_list("language", flat=True)
+    return sorted({l.strip() for entry in langs for l in entry.split(",")})
+
+def get_unique_genres():
+    genres = Movie.objects.exclude(genre__isnull=True).values_list("genre", flat=True)
+    return sorted({g.strip() for entry in genres for g in entry.split(",")})
+
+# ------------------------- Gemini Search ------------------------------
 
 def gemini_search(query: str) -> pd.DataFrame:
-    """Return DF columns (title, year). Falls back to OMDb."""
     prompt = (
         f"Return JSON list (max 6) of movies related to '{query}' with keys: title, year"
     )
@@ -54,10 +55,9 @@ def gemini_search(query: str) -> pd.DataFrame:
     except Exception:
         return omdb_search(query)
 
-# ------------------------- DETAILS -----------------------------
+# ------------------------- Gemini Details -----------------------------
 
 def gemini_details(title: str) -> dict:
-    """Return comprehensive movie dict. Fallback OMDb."""
     prompt = (
         f"For the film '{title}' output JSON: title, year, genre, language, cast (top3), imdb, rt, google, poster_url"
     )
@@ -67,7 +67,7 @@ def gemini_details(title: str) -> dict:
     except Exception:
         return omdb_details(title)
 
-# ------------------------- OMDb helpers ------------------------
+# ------------------------- OMDb Helpers -------------------------------
 
 def omdb_search(query: str) -> pd.DataFrame:
     url = f"https://www.omdbapi.com/?apikey={OMDB_KEY}&s={query}"
@@ -78,6 +78,7 @@ def omdb_search(query: str) -> pd.DataFrame:
 
     if "Search" not in res:
         return pd.DataFrame([])
+    
     return pd.DataFrame({
         "title": [m["Title"] for m in res["Search"]],
         "year":  [m["Year"] for m in res["Search"]]
@@ -92,6 +93,7 @@ def omdb_details(title: str) -> dict:
 
     if res.get("Response") == "False":
         return {}
+    
     return {
         "title": res.get("Title"),
         "year": res.get("Year"),
